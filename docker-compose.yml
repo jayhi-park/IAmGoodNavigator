@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  goodnav:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: vlnverse-goodnav:latest
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0          # GPU 0 (RTX A5000)
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/nvidia_icd.json
+      - DISPLAY=${DISPLAY:-}              # passed from host if set
+    volumes:
+      # ── Host GPU libs (fallback path so NVIDIA Vulkan/GL libs are resolved) ─
+      # Mounted AFTER container libs in LD_LIBRARY_PATH so no override of system libs
+      - /usr/lib/x86_64-linux-gnu:/usr/local/host-x86_64-libs:ro
+      - /lib/x86_64-linux-gnu:/usr/local/host-x86_64-syslibs:ro
+      # ── Isaac Sim installation — writable for kit/cache, kit/logs ─────────
+      - ../isaac-sim:/isaac-sim
+      - isaac_cache:/isaac-sim/kit/cache
+      - isaac_logs:/isaac-sim/kit/logs
+      - isaac_data:/isaac-sim/kit/data
+      # ── Demo code + scenes ────────────────────────────────────────────────
+      - .:/workspace/IAmGoodNavigator
+      # ── X11 socket for host-display forwarding ────────────────────────────
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      # ── Result output ─────────────────────────────────────────────────────
+      - goodnav_results:/results
+    ports:
+      - "5900:5900"   # VNC (direct)
+      - "6080:6080"   # noVNC (browser)
+    ipc: host
+    stdin_open: true
+    tty: true
+
+volumes:
+  isaac_cache:
+  isaac_logs:
+  isaac_data:
+  goodnav_results:
