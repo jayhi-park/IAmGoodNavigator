@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   goodnav:
     build:
@@ -8,25 +6,22 @@ services:
     image: vlnverse-goodnav:latest
     runtime: nvidia
     environment:
-      - NVIDIA_VISIBLE_DEVICES=0          # GPU 0 (RTX A5000)
+      - NVIDIA_VISIBLE_DEVICES=0
       - NVIDIA_DRIVER_CAPABILITIES=all
       - VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/nvidia_icd.json
-      - DISPLAY=${DISPLAY:-}              # passed from host if set
+      - DISPLAY=${DISPLAY:-}
+      - ACCEPT_EULA=Y
+      - PRIVACY_CONSENT=Y
     volumes:
-      # ── Host GPU libs (fallback path so NVIDIA Vulkan/GL libs are resolved) ─
-      # Mounted AFTER container libs in LD_LIBRARY_PATH so no override of system libs
-      - /usr/lib/x86_64-linux-gnu:/usr/local/host-x86_64-libs:ro
-      - /lib/x86_64-linux-gnu:/usr/local/host-x86_64-syslibs:ro
-      # ── Isaac Sim installation — writable for kit/cache, kit/logs ─────────
-      - ../isaac-sim:/isaac-sim
-      - isaac_cache:/isaac-sim/kit/cache
-      - isaac_logs:/isaac-sim/kit/logs
-      - isaac_data:/isaac-sim/kit/data
-      # ── Demo code + scenes ────────────────────────────────────────────────
+      # ── Isaac Sim cache (persisted between runs) ──────────────────
+      - isaac_ov_cache:/root/.cache/ov
+      - isaac_gl_cache:/root/.cache/nvidia/GLCache
+      - isaac_compute_cache:/root/.nv/ComputeCache
+      # ── Demo code + scenes ────────────────────────────────────────
       - .:/workspace/IAmGoodNavigator
-      # ── X11 socket for host-display forwarding ────────────────────────────
+      # ── X11 socket for host-display forwarding ────────────────────
       - /tmp/.X11-unix:/tmp/.X11-unix
-      # ── Result output ─────────────────────────────────────────────────────
+      # ── Result output ─────────────────────────────────────────────
       - goodnav_results:/results
     ports:
       - "5900:5900"   # VNC (direct)
@@ -36,7 +31,7 @@ services:
     tty: true
 
 volumes:
-  isaac_cache:
-  isaac_logs:
-  isaac_data:
+  isaac_ov_cache:
+  isaac_gl_cache:
+  isaac_compute_cache:
   goodnav_results:

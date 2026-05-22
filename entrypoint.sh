@@ -5,12 +5,6 @@ echo "========================================"
 echo " Isaac Sim Navigation Demo"
 echo "========================================"
 
-# ── 0. Add host GPU libs as fallback so NVIDIA Vulkan/GL deps resolve ─
-# Host /usr/lib/x86_64-linux-gnu is mounted at /usr/local/host-x86_64-libs.
-# Added AFTER container paths so container system libs still take precedence.
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/host-x86_64-libs:/usr/local/host-x86_64-syslibs"
-ldconfig 2>/dev/null || true
-
 # ── 1. Activate conda environment ─────────────────────────────────
 source /opt/conda/etc/profile.d/conda.sh
 conda activate goodnav

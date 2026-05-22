@@ -48,10 +48,26 @@ Download the necessary scene files and code:
 
 ## How to Run
 
-To run a specific demo episode, use the following command:
+### Option A: Docker (recommended)
+
+Requires Docker with NVIDIA Container Toolkit and NGC access (`docker login nvcr.io`).
+
+```bash
+# First time: grant X11 access and run (builds image automatically, ~20 min)
+bash start.sh --task fine --index 0 --work_dir /results
+
+# Subsequent runs (image already built)
+bash start.sh --task coarse --index 3 --work_dir /results
+```
+
+The first run pulls the official `nvcr.io/nvidia/isaac-sim:4.5.0` base image (~20 GB) and builds on top of it. Scene files are downloaded automatically on first launch.
+
+### Option B: Local conda environment
+
 ```bash
 python demo.py --task <task_type> --index <episode_index> --work_dir path_store_result
 ```
+
 *   `--task`: Choose either `fine` or `coarse`.
 *   `--index`: Choose an index from `0` to `9`.
 
